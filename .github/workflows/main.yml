@@ -1,12 +1,19 @@
-name: Terraform Deployment
+name: CI Workflow
 
 on:
-  push:
-    branches:
-      - main  # Trigger on pushes to the main branch
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Terraform action to perform (apply or destroy)'
+        required: true
+        default: 'apply'
+
+env:
+  AWS_REGION: us-east-1
+  AWS_ACCOUNT_ID: 767397823812
 
 jobs:
-  terraform:
+  terraform-deploy:
     runs-on: ubuntu-latest
 
     permissions:
@@ -14,27 +21,31 @@ jobs:
       contents: read
 
     steps:
-      # Step 1: Checkout repository
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Configure AWS Credentials
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: arn:aws:iam::767397823812:role/github-oidc
           aws-region: us-east-1
 
-      # Step 3: Set up Terraform
-      - name: Install Terraform
+      - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.4.6  # Specify Terraform version
 
-      # Step 4: Initialize Terraform
       - name: Terraform Init
         run: terraform init
 
-      # Step 5: Terraform Plan
       - name: Terraform Plan
         run: terraform plan
+
+      # - name: Terraform Plan
+      #   run: aa
+
+      - name: Terraform Apply or Destroy
+        run: |
+          if [ "${{ github.event.inputs.action }}" = "destroy" ]; then
+            terraform destroy -auto-approve
+          else
+            terraform apply -auto-approve
+          fi
