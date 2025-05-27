@@ -13,14 +13,13 @@ jobs:
       # Step 1: Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      # Step 2: Set AWS credentials from GitHub secrets
+      
+      # Step 2: Set up Terraform
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # Specify your AWS region
+          role-to-assume: arn:aws:iam::767397823812:role/GitHubActionsRole
+          aws-region: us-east-1
 
       # Step 3: Set up Terraform
       - name: Install Terraform
