@@ -15,16 +15,18 @@ jobs:
         uses: actions/checkout@v3
 
       # Step 2: Set AWS credentials from GitHub secrets
-      - name: Set AWS credentials
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1  # Specify your AWS region
 
       # Step 3: Set up Terraform
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.4.6  # Update to the version used locally
+          terraform_version: 1.4.6  # Specify Terraform version
 
       # Step 4: Initialize Terraform
       - name: Terraform Init
@@ -33,7 +35,3 @@ jobs:
       # Step 5: Terraform Plan
       - name: Terraform Plan
         run: terraform plan
-
-      # Step 6: Terraform Apply
-      #- name: Terraform Apply
-      #  run: terraform apply -auto-approve
